@@ -1,4 +1,4 @@
-import os
+"""This __init__ file will be called once triggered is generated."""
 import time
 import logging
 import datetime
@@ -7,12 +7,13 @@ from ..SharedCode import consts
 from ..SharedCode.logger import applogger
 from .account_usage_data import AccountUsageData
 
+
 def main(mytimer: func.TimerRequest) -> None:
     """
-    This function is triggered by a timer schedule.
+    Start the execution.
 
     Args:
-        mytimer (func.TimerRequest): The timer object that triggered the function
+        mytimer (func.TimerRequest): The timer object that triggered the function.
     """
     utc_timestamp = datetime.datetime.utcnow().replace(
         tzinfo=datetime.timezone.utc).isoformat()
