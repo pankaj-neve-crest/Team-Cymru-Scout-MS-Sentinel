@@ -1,4 +1,5 @@
 """This file contains constants require for Team Cymru Scout Data Connector."""
+
 import os
 
 # API ENDPOINTS

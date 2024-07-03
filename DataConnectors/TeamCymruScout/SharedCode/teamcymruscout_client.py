@@ -19,20 +19,21 @@ class TeamCymruScout:
         self.session = requests.Session()
         self.session.headers["Content-Type"] = "application/json"
         self.auth = None
-        self.set_authorization_header()
         self.ms_sentinel_obj = MicrosoftSentinel()
         self.error_logs = "{}(method={}) {}"
+        self.logs_starts_with = consts.LOGS_STARTS_WITH + " DomainDataCollector:"
+        self.set_authorization_header()
 
     def set_authorization_header(self):
         """Set the authorization header based on the authentication type."""
         if consts.AUTHENTICATION_TYPE == "API Key":
-            applogger.debug("API Key based authentiction is selected.")
+            applogger.debug("{} API Key based authentiction is selected.".format(self.logs_starts_with))
             self.session.headers["Authorization"] = "Token: {}".format(consts.API_KEY)
         else:
             self.auth = HTTPBasicAuth(
                 username=consts.USERNAME, password=consts.PASSWORD
             )
-            applogger.info("Username and password based authentiction is selected.")
+            applogger.debug("{} Username and password based authentiction is selected.".format(self.logs_starts_with))
 
     def make_rest_call(self, endpoint, params=None, body=None):
         """To call Team Cymru Scout API.
@@ -48,8 +49,8 @@ class TeamCymruScout:
         try:
             __method_name = inspect.currentframe().f_code.co_name
             applogger.debug(
-                "(method={}) Calling Team Cymru Scout API for endpoint={} with params={}".format(
-                    __method_name, endpoint, params
+                "{}(method={}) Calling Team Cymru Scout API for endpoint={} with params={}".format(
+                    self.logs_starts_with, __method_name, endpoint, params
                 )
             )
             request_url = "{}{}".format(self.base_url, endpoint)
@@ -63,7 +64,7 @@ class TeamCymruScout:
             else:
                 applogger.error(
                     "{}(method={}) Error while fetching data from url={}. Status code: {}, Error: {}".format(
-                        consts.LOGS_STARTS_WITH,
+                        self.logs_starts_with,
                         __method_name,
                         request_url,
                         response.status_code,
@@ -75,35 +76,35 @@ class TeamCymruScout:
             status_code = err.response.status_code
             if status_code == 401:
                 applogger.error(
-                    "{}(method={}) Please verify the provided credentials.".format(
-                        consts.LOGS_STARTS_WITH, __method_name
+                    "{}(method={}) Please verify the provided credentials. {}".format(
+                        self.logs_starts_with, __method_name, err
                     )
                 )
                 raise TeamCymruScoutException()
 
             elif status_code == 429:
                 applogger.error(
-                    "{}(method={}) Team Cymru Scout API Limit Exceeded.".format(
-                        consts.LOGS_STARTS_WITH, __method_name
+                    "{}(method={}) Team Cymru Scout API Limit Exceeded. {}".format(
+                        self.logs_starts_with, __method_name, err
                     )
                 )
                 raise TeamCymruScoutException()
 
             else:
                 applogger.error(
-                    self.error_logs.format(consts.LOGS_STARTS_WITH, __method_name, err)
+                    self.error_logs.format(self.logs_starts_with, __method_name, err)
                 )
                 raise TeamCymruScoutException()
         except requests.exceptions.RequestException as err:
             applogger.error(
-                self.error_logs.format(consts.LOGS_STARTS_WITH, __method_name, err)
+                self.error_logs.format(self.logs_starts_with, __method_name, err)
             )
             raise TeamCymruScoutException(
                 "Error while connecting to TeamCymruScout API: {}".format(err)
             )
         except Exception as err:
             applogger.error(
-                self.error_logs.format(consts.LOGS_STARTS_WITH, __method_name, err)
+                self.error_logs.format(self.logs_starts_with, __method_name, err)
             )
             raise TeamCymruScoutException()
 
@@ -118,13 +119,13 @@ class TeamCymruScout:
         __method_name = inspect.currentframe().f_code.co_name
         applogger.debug(
             "{}(method={}) Sending data to Sentinel.".format(
-                consts.LOGS_STARTS_WITH, __method_name
+                self.logs_starts_with, __method_name
             )
         )
         body = json.dumps(data)
         self.ms_sentinel_obj.post_data(body, table_name)
         applogger.info(
             "{}(method={}) Posted {} records into {} of Log Analytics Workspace.".format(
-                consts.LOGS_STARTS_WITH, __method_name, len(data), table_name
+                self.logs_starts_with, __method_name, len(data), table_name
             )
         )

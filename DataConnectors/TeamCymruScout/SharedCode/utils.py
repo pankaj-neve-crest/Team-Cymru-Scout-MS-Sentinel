@@ -4,28 +4,26 @@ import inspect
 import re
 from .logger import applogger
 from .teamcymruscout_exception import TeamCymruScoutException
-from .state_manager import StateManager
 from .get_logs_data import get_logs_data
+from .checkpoint_manager import CheckpointManager
 
 
 class TeamCymruScoutUtility:
     """Class for performing various tasks."""
 
-    def __init__(self, file_path) -> None:
+    def __init__(self, indicator_type) -> None:
         """
         Initialize the insatnce object of TeamCymruScoutUtility.
 
         Args:
-            file_path (str): path of the file.
+            indicator_type (str): type of indicator.
         """
-        self.state = StateManager(
-            connection_string=consts.CONN_STRING, file_path=file_path
-        )
         self.logs_starts_with = "{} DomainDataCollector:".format(
             consts.LOGS_STARTS_WITH
         )
         self.constants = {"domain": consts.DOMAIN_VALUES, "ip": consts.IP_VALUES}
         self.query_constants = {"domain": consts.DOMAIN_QUERY, "ip": consts.IP_QUERY}
+        self.checkpoint_obj = CheckpointManager(file_path=indicator_type)
 
     def validate_params(self):
         """
@@ -56,7 +54,7 @@ class TeamCymruScoutUtility:
             )
         applogger.debug(
             "{}(method={}) : Checking if all the environment variables exist or not.".format(
-                consts.LOGS_STARTS_WITH, __method_name
+                self.logs_starts_with, __method_name
             )
         )
         missing_required_field = False
@@ -66,7 +64,7 @@ class TeamCymruScoutUtility:
                 applogger.error(
                     '{}(method={}) : "{}" field is not set in the environment please set '
                     "the environment variable and run the app.".format(
-                        consts.LOGS_STARTS_WITH,
+                        self.logs_starts_with,
                         __method_name,
                         label,
                     )
@@ -77,11 +75,11 @@ class TeamCymruScoutUtility:
             )
         applogger.info(
             "{}(method={}) : All necessary variables are present in the Configuration.".format(
-                consts.LOGS_STARTS_WITH, __method_name
+                self.logs_starts_with, __method_name
             )
         )
 
-    def validate_ip_domain(self, indicator, regex_pattern):
+    def validate_ip_domain(self, indicator, regex_pattern, indicator_type):
         """
         To validate if the given indicator is a valid IP or domain.
 
@@ -96,68 +94,12 @@ class TeamCymruScoutUtility:
         if re.search(regex_pattern, indicator):
             return True
         else:
-            applogger.info(
-                "{}(method={}) : {} is not a valid IP/Domain.".format(
-                    consts.LOGS_STARTS_WITH, __method_name, indicator
+            applogger.debug(
+                "{}(method={}) : {} is not a valid {}".format(
+                    self.logs_starts_with, __method_name, indicator, indicator_type
                 )
             )
             return False
-
-    def get_checkpoint(self, indicator_type):
-        """
-        To retrieve the checkpoint for a given indicator type.
-
-        Args:
-            indicator_type (str): The type of the indicator.
-
-        Returns:
-            Any: The checkpoint value if it exists, otherwise None.
-
-        Raises:
-            TeamCymruScoutException: If an error occurs while retrieving the checkpoint.
-        """
-        __method_name = inspect.currentframe().f_code.co_name
-        try:
-            last_data_index = self.state.get()
-            if last_data_index:
-                return last_data_index
-            else:
-                applogger.debug(
-                    "{} (method={}): Checkpoint is not available for {}.".format(
-                        consts.LOGS_STARTS_WITH, __method_name, indicator_type
-                    )
-                )
-                return None
-        except Exception as err:
-            applogger.exception(
-                "{}: GET LAST DATA: {}".format(consts.LOGS_STARTS_WITH, err)
-            )
-            raise TeamCymruScoutException()
-
-    def save_checkpoint(self, data, indicator_type):
-        """
-        Save the checkpoint for a given indicator type.
-
-        Args:
-            data (Any): The data to be saved as the checkpoint.
-            indicator_type (str): The type of the indicator.
-
-        Raises:
-            TeamCymruScoutException: If an error occurs while saving the checkpoint.
-        """
-        __method_name = inspect.currentframe().f_code.co_name
-        try:
-            self.state.post(data)
-            applogger.info(
-                "{} (method={}) Checkpoint index={} saved for {}".format(
-                    consts.LOGS_STARTS_WITH, __method_name, data, indicator_type
-                )
-            )
-        except Exception as err:
-            applogger.exception(
-                "{} (method={}) {}".format(consts.LOGS_STARTS_WITH, __method_name, err)
-            )
-            raise TeamCymruScoutException()
 
     def get_data_from_input(self, indicator_type):
         """
@@ -220,13 +162,8 @@ class TeamCymruScoutUtility:
                 )
                 return None
             watchlist_data = [data[indicator_type] for data in logs_data]
-            last_checkpoint_data = self.get_checkpoint(indicator_type)
-            applogger.debug("Last Checkpoint Data: {}".format(last_checkpoint_data))
-            applogger.debug(
-                "Last {} value from watchlist: {}".format(
-                    indicator_type, watchlist_data[-1]
-                )
-            )
+            last_checkpoint_data = self.checkpoint_obj.get_checkpoint(indicator_type)
+            applogger.debug("{}(method={}) Last Checkpoint Data: {}".format(self.logs_starts_with, __method_name, last_checkpoint_data))
             if (
                 last_checkpoint_data is not None
                 and last_checkpoint_data != watchlist_data[-1]
