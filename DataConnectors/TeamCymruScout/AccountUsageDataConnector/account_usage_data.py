@@ -20,7 +20,7 @@ class AccountUsageData:
 
 
     def get_account_usage_data(self):
-        """To retrieve domain data from input/watchlist, fetch details from 
+        """To retrieve account usage data, fetch details from 
            Team Cymru Scout and post it to Sentinel."""
         __method_name = inspect.currentframe().f_code.co_name
         try:
