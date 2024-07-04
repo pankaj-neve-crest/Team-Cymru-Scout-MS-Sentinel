@@ -18,9 +18,7 @@ class TeamCymruScoutUtility:
         Args:
             indicator_type (str): type of indicator.
         """
-        self.logs_starts_with = "{} DomainDataCollector:".format(
-            consts.LOGS_STARTS_WITH
-        )
+        self.logs_starts_with = consts.LOGS_STARTS_WITH
         self.constants = {"domain": consts.DOMAIN_VALUES, "ip": consts.IP_VALUES}
         self.query_constants = {"domain": consts.DOMAIN_QUERY, "ip": consts.IP_QUERY}
         self.checkpoint_obj = CheckpointManager(file_path=indicator_type)
@@ -163,7 +161,9 @@ class TeamCymruScoutUtility:
                 return None
             watchlist_data = [data[indicator_type] for data in logs_data]
             last_checkpoint_data = self.checkpoint_obj.get_checkpoint(indicator_type)
-            applogger.debug("{}(method={}) Last Checkpoint Data: {}".format(self.logs_starts_with, __method_name, last_checkpoint_data))
+            applogger.debug("{}(method={}) Last Checkpoint Data: {}".format(
+                self.logs_starts_with, __method_name, last_checkpoint_data
+            ))
             if (
                 last_checkpoint_data is not None
                 and last_checkpoint_data != watchlist_data[-1]

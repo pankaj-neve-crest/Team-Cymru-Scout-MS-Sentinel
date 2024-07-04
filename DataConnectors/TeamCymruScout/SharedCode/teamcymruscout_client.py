@@ -21,7 +21,7 @@ class TeamCymruScout:
         self.auth = None
         self.ms_sentinel_obj = MicrosoftSentinel()
         self.error_logs = "{}(method={}) {}"
-        self.logs_starts_with = consts.LOGS_STARTS_WITH + " DomainDataCollector:"
+        self.logs_starts_with = consts.LOGS_STARTS_WITH
         self.set_authorization_header()
 
     def set_authorization_header(self):
