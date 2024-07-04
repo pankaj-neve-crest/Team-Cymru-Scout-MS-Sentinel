@@ -1,5 +1,4 @@
 """This file includes functions to collect account usage details from Team Cymru Scout API and send it to Sentinel."""
-import json
 import inspect
 from ..SharedCode import consts
 from ..SharedCode.logger import applogger
@@ -14,8 +13,6 @@ class AccountUsageData:
     def __init__(self) -> None:
         """Initialize the object of AccountUsageData."""
         self.logs_starts_with = consts.LOGS_STARTS_WITH + " AccountUsageData:"
-        self.input_domain_values = []
-        self.watchlist_domain_values = []
         self.rest_helper_obj = TeamCymruScout()
         self.utility_obj = TeamCymruScoutUtility(file_path="accountUsage")
         self.utility_obj.validate_params()
@@ -39,14 +36,10 @@ class AccountUsageData:
             account_data = self.rest_helper_obj.make_rest_call(
                 endpoint=consts.ACCOUNT_USAGE_ENDPOINT, params={}
             )
-            body = json.dumps(account_data)
-            response = self.rest_helper_obj.send_data_to_sentinel(
-                body, consts.ACCOUNT_USAGE_TABLE_NAME
+            self.rest_helper_obj.send_data_to_sentinel(
+                account_data, consts.ACCOUNT_USAGE_TABLE_NAME
             )
 
-            applogger.debug("{}(method={}) Sentinel response: {}".format(
-                self.logs_starts_with, __method_name, response)
-            )
         except Exception as err:
             applogger.error(
                 "{}(method={}) {}".format(self.logs_starts_with, __method_name, err)

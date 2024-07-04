@@ -24,7 +24,7 @@ def main(mytimer: func.TimerRequest) -> None:
     end_time = time.time()
 
     applogger.info(
-        "{} DomainDataCollector: Time taken to ingest domain data is {}".format(
+        "{} AccountUsageDataCollector: Time taken to ingest domain data is {}".format(
             consts.LOGS_STARTS_WITH, end_time-start_time
         )
     )
