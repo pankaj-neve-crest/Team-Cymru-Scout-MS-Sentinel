@@ -14,7 +14,7 @@ class AccountUsageDataCollector:
         """Initialize the object of AccountUsageDataCollector."""
         self.logs_starts_with = consts.LOGS_STARTS_WITH + " AccountUsageDataCollector:"
         self.rest_helper_obj = TeamCymruScout()
-        self.utility_obj = TeamCymruScoutUtility(indicator_type="accountUsage")
+        self.utility_obj = TeamCymruScoutUtility(indicator_type=None)
         self.utility_obj.validate_params()
 
     def get_account_usage_data(self):

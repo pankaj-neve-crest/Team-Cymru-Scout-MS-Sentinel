@@ -11,7 +11,7 @@ from .checkpoint_manager import CheckpointManager
 class TeamCymruScoutUtility:
     """Class for performing various tasks."""
 
-    def __init__(self, indicator_type) -> None:
+    def __init__(self, indicator_type=None) -> None:
         """
         Initialize the insatnce object of TeamCymruScoutUtility.
 
@@ -21,7 +21,8 @@ class TeamCymruScoutUtility:
         self.logs_starts_with = consts.LOGS_STARTS_WITH
         self.constants = {"domain": consts.DOMAIN_VALUES, "ip": consts.IP_VALUES}
         self.query_constants = {"domain": consts.DOMAIN_QUERY, "ip": consts.IP_QUERY}
-        self.checkpoint_obj = CheckpointManager(file_path=indicator_type)
+        if indicator_type is not None:
+            self.checkpoint_obj = CheckpointManager(file_path=indicator_type)
 
     def validate_params(self):
         """
