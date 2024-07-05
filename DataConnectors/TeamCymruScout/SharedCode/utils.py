@@ -21,6 +21,7 @@ class TeamCymruScoutUtility:
         self.logs_starts_with = consts.LOGS_STARTS_WITH
         self.constants = {"domain": consts.DOMAIN_VALUES, "ip": consts.IP_VALUES}
         self.query_constants = {"domain": consts.DOMAIN_QUERY, "ip": consts.IP_QUERY}
+
         if indicator_type is not None:
             self.checkpoint_obj = CheckpointManager(file_path=indicator_type)
 
