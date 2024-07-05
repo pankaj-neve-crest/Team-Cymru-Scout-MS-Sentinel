@@ -310,7 +310,7 @@
                         "LogLevel": "[parameters('LogLevel')]",
                         "Schedule": "[trim(parameters('Schedule'))]",
                         "AccountUsageSchedule": "[trim(parameters('AccountUsageSchedule'))]",
-                        "WEBSITE_RUN_FROM_PACKAGE": "https://github.com/niralishah-crest/TeamCymruScout/raw/domain-data-collector/TeamCymruScoutDataConnector.zip"
+                        "WEBSITE_RUN_FROM_PACKAGE": "https://github.com/pankaj-neve-crest/Team-Cymru-Scout-MS-Sentinel/raw/master/DataConnectors/TeamCymruScout/TeamCymruScout.zip"
                     }
                 }
             ]
