@@ -21,8 +21,11 @@ class TeamCymruScoutUtility:
         self.logs_starts_with = consts.LOGS_STARTS_WITH
         self.constants = {"domain": consts.DOMAIN_VALUES, "ip": consts.IP_VALUES}
         self.query_constants = {"domain": consts.DOMAIN_QUERY, "ip": consts.IP_QUERY}
+        applogger.info("indicator_type :: {}".format(indicator_type))
         if indicator_type is not None:
             self.checkpoint_obj = CheckpointManager(file_path=indicator_type)
+        else:
+            applogger.info("indicator_type :: {}".format(indicator_type))
 
     def validate_params(self):
         """
