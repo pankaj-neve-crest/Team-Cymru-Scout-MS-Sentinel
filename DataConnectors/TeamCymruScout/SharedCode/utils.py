@@ -11,7 +11,7 @@ from .checkpoint_manager import CheckpointManager
 class TeamCymruScoutUtility:
     """Class for performing various tasks."""
 
-    def __init__(self, indicator_type) -> None:
+    def __init__(self, indicator_type=None) -> None:
         """
         Initialize the insatnce object of TeamCymruScoutUtility.
 
